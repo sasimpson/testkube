@@ -10,17 +10,28 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/", HomeHandler)
-	http.Handle("/", r)
-	http.ListenAndServe(":8080", nil)
+func Middleware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hostname, _ := os.Hostname()
+		w.Header().Set("X-Goos", runtime.GOOS)
+		w.Header().Set("X-Goarch", runtime.GOARCH)
+		w.Header().Set("X-Pod-Name", hostname)
+		log.Println(runtime.GOOS, runtime.GOARCH, hostname)
+		h.ServeHTTP(w,r)
+	})
 }
 
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	hostname, _ := os.Hostname()
-	fmt.Fprintf(w, "Hi world!\n")
-	fmt.Fprintf(w, "i am %s\n", hostname)
-	fmt.Fprintf(w, "OS: %s\nArchitecture: %s\n", runtime.GOOS, runtime.GOARCH)
-	log.Printf("%s: %s, %s", hostname, runtime.GOOS, runtime.GOARCH)
+func main() {
+	r := mux.NewRouter()
+	r.Handle("/", Middleware(HomeHandler()))
+	http.Handle("/", r)
+	http.ListenAndServe(":8080", r)
 }
+
+func HomeHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hi world!\n")
+	})
+}
+
+
