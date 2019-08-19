@@ -6,11 +6,14 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
 
-func Middleware(h http.Handler) http.Handler {
+var staticDir = os.Getenv("TESTKUBE_STATICDIR")
+
+func middleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		hostname, _ := os.Hostname()
 		w.Header().Set("X-Goos", runtime.GOOS)
@@ -23,15 +26,15 @@ func Middleware(h http.Handler) http.Handler {
 
 func main() {
 	r := mux.NewRouter()
-	r.Handle("/", Middleware(HomeHandler()))
+	r.Handle("/", middleware(homeHandler()))
+	r.Handle("/static", middleware(http.StripPrefix(strings.TrimRight("/static/", "/"), http.FileServer(http.Dir(staticDir)))))
 	http.Handle("/", r)
 	http.ListenAndServe(":8080", r)
 }
 
-func HomeHandler() http.Handler {
+func homeHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hi world!\n")
 	})
 }
-
 
