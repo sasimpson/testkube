@@ -20,7 +20,7 @@ func middleware(h http.Handler) http.Handler {
 		w.Header().Set("X-Goarch", runtime.GOARCH)
 		w.Header().Set("X-Pod-Name", hostname)
 		log.Println(runtime.GOOS, runtime.GOARCH, hostname)
-		h.ServeHTTP(w,r)
+		h.ServeHTTP(w, r)
 	})
 }
 
@@ -28,8 +28,7 @@ func main() {
 	r := mux.NewRouter()
 	r.Handle("/", middleware(homeHandler()))
 	r.Handle("/static", middleware(http.StripPrefix(strings.TrimRight("/static/", "/"), http.FileServer(http.Dir(staticDir)))))
-	http.Handle("/", r)
-	http.ListenAndServe(":8080", r)
+	http.ListenAndServe(":80", r)
 }
 
 func homeHandler() http.Handler {
@@ -37,4 +36,3 @@ func homeHandler() http.Handler {
 		fmt.Fprintf(w, "Hi world!\n")
 	})
 }
-

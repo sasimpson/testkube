@@ -1,3 +1,5 @@
 module github.com/sasimpson/testkube
 
-require github.com/gorilla/mux v1.6.2
+go 1.25.6
+
+require github.com/gorilla/mux v1.8.1
