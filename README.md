@@ -4,4 +4,4 @@ An image I used to test k8s, similar to the nginx bare image. This has middlewar
 
 You can use with docker: 
 
-  docker push ssimpson/testkube:latest
+    docker push ssimpson/testkube:latest
