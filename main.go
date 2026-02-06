@@ -46,9 +46,8 @@ func main() {
 	server := &http.Server{
 		Addr: ":8080", Handler: r,
 	}
-
+	slog.Info("Starting HTTP server", "port", 8080)
 	server.ListenAndServe()
-	slog.Info("HTTP server started", "port", 8080)
 
 }
 
